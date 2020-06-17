@@ -19,6 +19,8 @@ DEFAULT_REQUEST_HEADERS = {
 "User-Agent" : "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Mobile Safari/537.36",
 
 }
+MYSQL_URI  = "127.0.0.1"
+MYSQL_DATABASE = "ctripTicket"
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'ctripTicket (+http://www.yourdomain.com)'
 
@@ -68,9 +70,9 @@ ROBOTSTXT_OBEY = False
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'ctripTicket.pipelines.CtripticketPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'ctripTicket.pipelines.CtripticketPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html

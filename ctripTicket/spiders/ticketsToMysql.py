@@ -74,9 +74,13 @@ class CtripTicketsSpider(scrapy.Spider):
                         method='POST',
                         body=json.dumps(request_payload),
                         dont_filter=True,
-                        callback=self.parse(fromcity, tocity))
+                        callback=self.parse)
 
-    def parse(self, response, fromcity, tocity):
+    def parse(self, response):
+        #以下部分需要修改，暂只做上海广州部分
+        fromcity = "上海"
+        tocity = "广州"
+        
         flightItem = CtripticketItem()
         try:
             routelist = json.loads(response.text).get('data').get('routeList')
@@ -93,7 +97,6 @@ class CtripTicketsSpider(scrapy.Spider):
                         flightItem["precision"] = flight.get("punctualityRate")
                         flightItem["arriveDate"] = flight.get("arrivalDate")
                         flightItem["price"] = legs.get('characteristic').get('lowestPrice')
-                        print(flight)
+                        yield flightItem
         except Exception as e:
             print(e)
-        yield flightItem
