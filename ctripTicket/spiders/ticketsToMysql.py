@@ -2,7 +2,6 @@ import scrapy
 from ctripTicket.items import CtripticketItem
 import time
 import json
-import requests
 from ctripTicket.settings import DEFAULT_REQUEST_HEADERS
 
 
@@ -65,9 +64,7 @@ class CtripTicketsSpider(scrapy.Spider):
                              "acity": tocode,
                              "dcityname": fromcity,
                              "acityname": tocity,
-                             "date": date,
-                             "dcityid": 2,
-                             "acityid": 32}
+                             "date": date, }
                         ]
                     }
                     time.sleep(10)
@@ -77,12 +74,26 @@ class CtripTicketsSpider(scrapy.Spider):
                         method='POST',
                         body=json.dumps(request_payload),
                         dont_filter=True,
-                        callback=self.parse)
+                        callback=self.parse(fromcity, tocity))
 
-    def parse(self, response):
-        flight = CtripticketItem()
+    def parse(self, response, fromcity, tocity):
+        flightItem = CtripticketItem()
         try:
             routelist = json.loads(response.text).get('data').get('routeList')
-            print("we got", routelist)
+            if routelist != "" and routelist != None:
+                for route in routelist:
+                    if route.get('legs') == 1:
+                        legs = route.get('legs')[0]
+                        flight = legs.get('flight')
+                        flightItem["flightCompany"] = flight.get("airlineName")
+                        flightItem["flightNumber"] = flight.get("flightNumber")
+                        flightItem["fromcity"] = fromcity
+                        flightItem["tocity"] = tocity
+                        flightItem["flightDate"] = flight.get("departureDate")
+                        flightItem["precision"] = flight.get("punctualityRate")
+                        flightItem["arriveDate"] = flight.get("arrivalDate")
+                        flightItem["price"] = legs.get('characteristic').get('lowestPrice')
+                        print(flight)
         except Exception as e:
             print(e)
+        yield flightItem
